@@ -37,6 +37,20 @@ button{font:inherit;cursor:pointer}
 #dc{flex:1;min-height:0;width:100%;touch-action:none}
 #db{display:flex;gap:10px;padding:10px 14px}#db .pr{margin:0;flex:1}
 .on2{background:var(--ac);color:#fff;border-color:var(--ac)}
+.box.wide{box-sizing:border-box;width:min(96vw,1000px);padding:14px 20px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:4px}
+.hd h1{margin:0;font-size:21px}.hd .pr{width:auto;margin:0;padding:10px 34px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px}
+.cols label.l{margin:9px 0 4px}
+.cols .sc{padding:6px 9px;font-size:13px}
+.cols input[type=text]{padding:7px 10px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.th{padding:2px;border:1px solid var(--line);border-radius:10px;background:transparent;line-height:0}
+.th canvas{width:40px;height:46px}
+.th.on2{background:transparent;box-shadow:0 0 0 2px var(--ac)}
+.cols .sm{margin-top:4px}
+.ft{text-align:center;margin-top:8px}
+@media (max-width:760px){.cols{grid-template-columns:1fr}.box.wide{width:min(94vw,420px)}}
 #sp{position:absolute;right:16px;bottom:18px;color:#fff;font-weight:800;text-align:right;text-shadow:0 2px 6px #0008}
 #sp b{font-size:34px}#spt{width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,.3);margin-top:4px;margin-left:auto}
 #spb{height:100%;border-radius:3px;background:#fff;width:0}
@@ -49,37 +63,45 @@ button{font:inherit;cursor:pointer}
  <div id="sp" style="display:none"><canvas id="spc" width="280" height="280"></canvas></div>
  <div id="big"></div><div id="msg"></div><div id="hint"></div>
 
- <div class="pn on" id="menu"><div class="box">
-  <h1>🏎️ ドリフトレース</h1>
-  <label class="l">名前</label><input type="text" id="nm" maxlength="12">
-  <label class="l">車の色</label>
-  <div class="row"><input type="color" id="cl"><canvas id="pv" width="64" height="64"></canvas>
-   <label class="sc" for="fi">車の画像(PNG)を選ぶ</label><input type="file" id="fi" accept="image/*" hidden>
-   <button class="sc" id="rs">リセット</button></div>
-  <label class="l">コース</label>
-  <div class="row"><button class="sc" id="dw1">✏️ 自分で描く</button><button class="sc" id="df1">標準に戻す</button></div>
-  <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="sc" id="rd1">🎲 ランダム（周回）</button><button class="sc" id="rd2">🎲 ランダム（スタート→ゴール）</button></div>
-  <div class="sm" id="cs" style="margin-top:6px"></div>
-  <label class="l">車のタイプ</label>
-  <div class="row" style="flex-wrap:wrap"><button class="sc" id="ct0">⚖️ 標準型</button><button class="sc" id="ct1">🚀 加速型</button><button class="sc" id="ct2">🏁 最高速型</button><button class="sc" id="ct3">🌀 曲がりやすい型</button><button class="sc" id="ct4">🔥 ドリフト加速型</button></div>
-  <div class="sm" id="ctd" style="margin-top:6px"></div>
-  <label class="l">音（mp3など。友達にも聞こえます／1.2MBまで。はじめは音なしです）</label>
-  <div class="row"><span style="width:76px;font-size:13px">エンジン音</span><label class="sc" for="fe">選ぶ</label><input type="file" id="fe" accept="audio/*" hidden><button class="sc" id="ce">なし</button></div>
-  <div class="sm" id="s_engine" style="margin:2px 0 8px">（音なし）</div>
-  <div class="row"><span style="width:76px;font-size:13px">ドリフト音</span><label class="sc" for="fd">選ぶ</label><input type="file" id="fd" accept="audio/*" hidden><button class="sc" id="cd">なし</button></div>
-  <div class="sm" id="s_drift" style="margin:2px 0 8px">（音なし）</div>
-  <div class="row"><span style="width:76px;font-size:13px">音量</span><input type="range" id="vol" min="0" max="100" style="flex:1"></div>
-  <label class="l">カメラの近さ（遊んでいる最中は ↑ ↓ キーでも調整）</label>
-  <input type="range" id="cz" min="60" max="250" style="width:100%">
-  <label class="l">コースの雰囲気</label>
-  <div class="row"><button class="sc" id="sty0">🏁 ふつう</button><button class="sc" id="sty1">⛰️ 峠</button></div>
-  <label class="l">カメラの追従（左：ゆるく遅れてついてくる ／ 右：ぴったり）</label>
-  <input type="range" id="cf" min="0" max="100" style="width:100%">
-  <label class="l">ルーム名（友だちと同じ文字を入れると同じレースに入れます）</label>
-  <input type="text" id="rm" maxlength="20" placeholder="空欄ならひとりで走ります">
-  <button class="pr" id="go">スタート</button>
-  <div class="sm">操作：画面の左側／右側をタッチ（パソコンは ← → キー）。<br>左右を同時に押すとブレーキ、押し続けるとバック。<br>画像は「車の前が上向き」の縦長PNGがおすすめです。</div>
- </div></div>
+ <div class="pn on" id="menu"><div class="box wide">
+   <div class="hd"><h1>🏎️ ドリフトレース</h1><button class="pr" id="go">スタート</button></div>
+   <div class="cols">
+    <div>
+     <label class="l">名前</label><input type="text" id="nm" maxlength="12">
+     <label class="l">車の見た目</label>
+     <div class="chips">
+      <button class="th" id="cst0"><canvas width="40" height="46"></canvas></button><button class="th" id="cst1"><canvas width="40" height="46"></canvas></button><button class="th" id="cst2"><canvas width="40" height="46"></canvas></button><button class="th" id="cst3"><canvas width="40" height="46"></canvas></button><button class="th" id="cst4"><canvas width="40" height="46"></canvas></button><button class="th" id="cst5"><canvas width="40" height="46"></canvas></button>
+     </div>
+     <div class="row" style="margin-top:6px;gap:8px"><input type="color" id="cl" style="width:40px;height:34px"><canvas id="pv" width="64" height="64" style="width:34px;height:34px"></canvas>
+      <label class="sc" for="fi" title="車の前が上向きの縦長PNGがおすすめです">🖼️ 画像</label><input type="file" id="fi" accept="image/*" hidden>
+      <button class="sc" id="rs">もどす</button></div>
+     <label class="l">性能</label>
+     <div class="chips"><button class="sc" id="ct0">⚖️ 標準</button><button class="sc" id="ct1">🚀 加速</button><button class="sc" id="ct2">🏁 最高速</button><button class="sc" id="ct3">🌀 曲がる</button><button class="sc" id="ct4">🔥 ドリフト加速</button></div>
+     <div class="sm" id="ctd"></div>
+    </div>
+    <div>
+     <label class="l">コース</label>
+     <div class="chips"><button class="sc" id="dw1">✏️ 自分で描く</button><button class="sc" id="df1">標準に戻す</button><button class="sc" id="rd1">🎲 周回</button><button class="sc" id="rd2">🎲 スタート→ゴール</button></div>
+     <div class="sm" id="cs"></div>
+     <label class="l">雰囲気</label>
+     <div class="chips"><button class="sc" id="sty0">🏁 ふつう</button><button class="sc" id="sty1">⛰️ 峠</button></div>
+     <label class="l">ルーム名（同じ名前の友だちと同じレースへ）</label>
+     <input type="text" id="rm" maxlength="20" placeholder="空欄ならひとり">
+    </div>
+    <div>
+     <label class="l">エンジン音</label>
+     <div class="chips"><button class="sc" id="ce">なし</button><button class="sc" id="ep0">🚗 標準</button><button class="sc" id="ep1">🏎️ スポーツ</button><button class="sc" id="ep2">🔊 V8</button><button class="sc" id="ep3">⚡ 電気</button><label class="sc" for="fe" title="mp3など（友達にも聞こえます／1.2MBまで）">📁</label><input type="file" id="fe" accept="audio/*" hidden></div>
+     <div class="sm" id="s_engine">（音なし）</div>
+     <label class="l">ドリフト音</label>
+     <div class="chips"><button class="sc" id="cd">なし</button><button class="sc" id="dp0">キュッ</button><button class="sc" id="dp1">ザー</button><button class="sc" id="dp2">高音</button><button class="sc" id="dp3">低音</button><label class="sc" for="fd" title="mp3など（友達にも聞こえます／1.2MBまで）">📁</label><input type="file" id="fd" accept="audio/*" hidden></div>
+     <div class="sm" id="s_drift">（音なし）</div>
+     <label class="l">音量</label><input type="range" id="vol" min="0" max="100" style="width:100%">
+     <label class="l">カメラの近さ</label><input type="range" id="cz" min="60" max="250" style="width:100%">
+     <label class="l">カメラの追従（左：ゆるい ／ 右：ぴったり）</label><input type="range" id="cf" min="0" max="100" style="width:100%">
+    </div>
+   </div>
+   <div class="sm ft">左右をタッチ（← →キー）で曲がる／同時に押すとブレーキ／↑↓キーでカメラの近さ</div>
+  </div></div>
 
  <div class="pn" id="lobby"><div class="box">
   <h1>ルーム：<span id="rn"></span></h1>
@@ -120,11 +142,11 @@ let HW=touge?68:78.2;const LAPS=3;  /* 道の半分の太さ：峠は68 / ふつ
 /* 速度の設定：最高速度 / いちばん遅い速度 / 加速のはやさ / 減速のはやさ */
 /* 車のタイプごとの性能：K=メーターの最高km/h / 加速 / 曲がりやすさ / タイヤのグリップ */
 const CARS={
- std:{K:190,ACC:340,TURN:2.7,GRIP:1.4,d:'基本のバランス型（メーター最高190）'},
- acc:{K:172,ACC:520,TURN:2.7,GRIP:1.4,d:'加速がすごく速い。そのかわり最高速は低め（メーター最高172）'},
- top:{K:208,ACC:240,TURN:2.7,GRIP:1.4,d:'最高速度が高い（メーター最高208）。加速はゆっくり'},
- hand:{K:172,ACC:340,TURN:3.6,GRIP:1.9,d:'ハンドルのききがよく、曲がりやすい。最高速は低め（メーター最高172）'},
- drf:{K:164,ACC:300,TURN:2.7,GRIP:1.4,B:1.25,d:'ふだんは少し低め（メーター最高164）。けむりが出るドリフトを長くして、まっすぐ戻ると、その分ぐっと加速（ブースト）します'}};
+ std:{K:190,ACC:340,TURN:2.7,GRIP:1.4,d:'バランス型'},
+ acc:{K:172,ACC:520,TURN:2.7,GRIP:1.4,d:'加速が速い／最高速は低め'},
+ top:{K:208,ACC:240,TURN:2.7,GRIP:1.4,d:'最高速が高い／加速はゆっくり'},
+ hand:{K:172,ACC:340,TURN:3.6,GRIP:1.9,d:'よく曲がる／最高速は低め'},
+ drf:{K:164,ACC:300,TURN:2.7,GRIP:1.4,B:1.25,d:'ふだんは低め／ドリフトのあとブースト'}};
 let carType=(()=>{const v=LS('dr_car');return CARS[v]?v:'std'})();
 let MAXV,ACC,TURN,GRIP,GMAX;const MINV=170,DEC=320,BRAKE=700,REVA=320,REVV=190;
 function applyCar(){const c=CARS[carType];MAXV=c.K/.3;ACC=c.ACC;TURN=c.TURN;GRIP=c.GRIP;GMAX=Math.max(180,Math.ceil(c.K*(c.B||1)/20)*20)}
@@ -174,14 +196,47 @@ try{const sv=JSON.parse(LS('dr_course')||'null'),pp=Array.isArray(sv)?sv:sv&&sv.
 let name=LS('dr_name')||'プレイヤー',col=LS('dr_col')||'#ff5a36',meImg=null,shareSkin=null;
 $('nm').value=name;$('cl').value=col;
 function rr(g,x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):g.rect(x,y,w,h);g.fill()}
-function carShape(g,img,c){
+function pth(g,pts){g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();g.fill()}
+function carShape(g,img,c,st){
  if(img){const hh=68,ww=Math.min(84,hh*img.width/img.height);g.drawImage(img,-ww/2,-hh/2,ww,hh);return}
- g.fillStyle=c;rr(g,-17,-33,34,66,10);
- g.fillStyle='rgba(255,255,255,.88)';rr(g,-12,-15,24,14,4);
- g.fillStyle='rgba(0,0,0,.28)';rr(g,-12,7,24,11,4);
- g.fillStyle='#ffe27a';rr(g,-14,-32,7,4,2);rr(g,7,-32,7,4,2);
+ const W='rgba(255,255,255,.88)',D='rgba(0,0,0,.28)',Y='#ffe27a';st=st|0;
+ if(st===1){ /* スポーツ */
+  g.fillStyle=c;g.beginPath();g.moveTo(0,-34);g.bezierCurveTo(14,-32,17,-14,17,0);g.lineTo(17,27);g.quadraticCurveTo(17,33,11,33);g.lineTo(-11,33);g.quadraticCurveTo(-17,33,-17,27);g.lineTo(-17,0);g.bezierCurveTo(-17,-14,-14,-32,0,-34);g.fill();
+  g.fillStyle='rgba(255,255,255,.55)';rr(g,-4,-30,3,50,1);rr(g,1,-30,3,50,1);
+  g.fillStyle=W;rr(g,-10,-12,20,12,6);g.fillStyle=D;rr(g,-17,28,34,5,2);
+  g.fillStyle=Y;rr(g,-13,-29,6,3,1.5);rr(g,7,-29,6,3,1.5);
+ }else if(st===2){ /* ラリー */
+  g.fillStyle=c;rr(g,-17,-33,34,66,5);
+  g.fillStyle=D;rr(g,-17,-8,4,34,1);rr(g,13,-8,4,34,1);
+  g.fillStyle=W;rr(g,-11,-17,22,14,3);g.fillStyle='rgba(0,0,0,.3)';rr(g,-9,0,18,15,3);
+  g.fillStyle='#fff';g.beginPath();g.arc(0,-26,5,0,7);g.fill();g.fillStyle='#222';g.fillRect(-1,-31,2,10);
+  g.fillStyle=Y;g.beginPath();g.arc(-9,-31,3,0,7);g.arc(9,-31,3,0,7);g.fill();
+ }else if(st===3){ /* クラシック */
+  g.fillStyle=c;rr(g,-17,-31,34,62,17);
+  g.fillStyle=D;rr(g,-17,-8,5,22,2);rr(g,12,-8,5,22,2);
+  g.fillStyle=W;rr(g,-10,-14,20,14,8);g.fillStyle='rgba(0,0,0,.22)';rr(g,-10,6,20,10,5);
+  g.fillStyle=Y;g.beginPath();g.arc(-10,-26,3.5,0,7);g.arc(10,-26,3.5,0,7);g.fill();
+  g.fillStyle='#e6e6e6';rr(g,-11,28,22,3,1.5);
+ }else if(st===4){ /* フォーミュラ */
+  g.fillStyle='#222';rr(g,-17,-26,8,14,2);rr(g,9,-26,8,14,2);rr(g,-17,12,8,18,2);rr(g,9,12,8,18,2);
+  g.fillStyle=c;rr(g,-8,-30,16,58,7);rr(g,-17,-34,34,4,1);rr(g,-14,28,28,5,1);
+  g.fillStyle=D;rr(g,-17,-34,34,1.5,0);g.fillStyle=W;g.beginPath();g.arc(0,-2,5,0,7);g.fill();
+ }else if(st===5){ /* ピックアップ */
+  g.fillStyle=c;rr(g,-17,-33,34,66,6);
+  g.fillStyle=W;rr(g,-12,-25,24,12,3);
+  g.fillStyle='rgba(0,0,0,.32)';rr(g,-14,-6,28,36,3);g.fillStyle='rgba(0,0,0,.15)';rr(g,-12,-4,24,32,2);
+  g.fillStyle=Y;rr(g,-14,-32,7,4,2);rr(g,7,-32,7,4,2);
+ }else{ /* セダン（もとの形） */
+  g.fillStyle=c;rr(g,-17,-33,34,66,10);
+  g.fillStyle=W;rr(g,-12,-15,24,14,4);
+  g.fillStyle=D;rr(g,-12,7,24,11,4);
+  g.fillStyle=Y;rr(g,-14,-32,7,4,2);rr(g,7,-32,7,4,2);
+ }
 }
-function renderPreview(){const g=$('pv').getContext('2d');g.clearRect(0,0,64,64);g.save();g.translate(32,32);g.scale(.85,.85);carShape(g,meImg,col);g.restore()}
+let carStyle=Math.max(0,Math.min(5,+LS('dr_cs')||0));
+function renderPreview(){const g=$('pv').getContext('2d');g.clearRect(0,0,64,64);g.save();g.translate(32,32);g.scale(.85,.85);carShape(g,meImg,col,carStyle);g.restore();
+ for(let i=0;i<6;i++){const b=$('cst'+i),cv=b.firstElementChild,h=cv.getContext('2d');h.clearRect(0,0,40,46);h.save();h.translate(20,23);h.scale(.62,.62);carShape(h,null,col,i);h.restore();b.classList.toggle('on2',!meImg&&carStyle===i)}}
+for(let i=0;i<6;i++)$('cst'+i).onclick=()=>{carStyle=i;LS('dr_cs',String(i));meImg=null;shareSkin=null;LS('dr_skin','');renderPreview()};
 function applyImage(im,save){
  const a=im.width/im.height;let h=128,w=Math.round(h*a);if(w>128){w=128;h=Math.round(w/a)}
  const c=document.createElement('canvas');c.width=Math.max(4,w);c.height=Math.max(4,h);
@@ -349,7 +404,7 @@ function endList(){
   if(r.me)t.style.fontWeight='800';li.append(d,t);ul.append(li)});
 }
 setInterval(()=>{if(state==='done')endList();if(state==='lobby')lobbyList()},400);
-setInterval(()=>{if(room&&(state==='count'||state==='race'||state==='done'))pres({x:Math.round(me.x),y:Math.round(me.y),h:+me.h.toFixed(2),p:Math.round(me.total),fin:Math.round(me.fin)||0,b:me.brk?1:0})},70);
+setInterval(()=>{if(room&&(state==='count'||state==='race'||state==='done'))pres({x:Math.round(me.x),y:Math.round(me.y),h:+me.h.toFixed(2),p:Math.round(me.total),fin:Math.round(me.fin)||0,b:me.brk?1:0,cs:carStyle})},70);
 
 /* ---- 操作 ---- */
 const keys={},ptr=new Map();
@@ -424,6 +479,32 @@ async function setSound(k,buf,nm,save){
 }
 function pick(k,inp){inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;actx();await setSound(k,await f.arrayBuffer(),f.name,true);inp.value=''}}
 pick('engine',$('fe'));pick('drift',$('fd'));
+/* 内蔵の音（その場で作る） */
+const SRT=22050;
+function wavOf(f){const L=f.length;let pk=0;for(let i=0;i<L;i++)pk=Math.max(pk,Math.abs(f[i]));
+ const b=new ArrayBuffer(44+L*2),w=new DataView(b),W=(o,t)=>{for(let i=0;i<t.length;i++)w.setUint8(o+i,t.charCodeAt(i))};
+ W(0,'RIFF');w.setUint32(4,36+L*2,true);W(8,'WAVE');W(12,'fmt ');w.setUint32(16,16,true);w.setUint16(20,1,true);w.setUint16(22,1,true);w.setUint32(24,SRT,true);w.setUint32(28,SRT*2,true);w.setUint16(32,2,true);w.setUint16(34,16,true);W(36,'data');w.setUint32(40,L*2,true);
+ for(let i=0;i<L;i++)w.setInt16(44+i*2,Math.round(f[i]/(pk||1)*.55*32767),true);return b}
+const ENG=[
+ {nm:'標準エンジン（内蔵）',f:55,h:[[1,1],[2,.7],[3,.5],[4,.4],[5,.25],[6,.2],[8,.12]],am:0,amd:0,drive:1.8},
+ {nm:'スポーツエンジン（内蔵）',f:110,h:[[1,.8],[2,.6],[3,.55],[4,.5],[5,.45],[6,.4],[7,.35],[8,.3],[10,.2],[12,.15]],am:0,amd:0,drive:2.2},
+ {nm:'重低音V8（内蔵）',f:33,h:[[1,1],[2,.9],[3,.6],[4,.5],[5,.3],[6,.3],[8,.15]],am:11,amd:.35,drive:2},
+ {nm:'電気モーター（内蔵）',f:220,h:[[1,1],[2,.35],[3,.2],[4,.12]],am:0,amd:0,drive:1}];
+function engWav(p){const L=SRT,f=new Float32Array(L);let sum=0;for(const[,a]of p.h)sum+=a;
+ for(let i=0;i<L;i++){const t=i/SRT;let v=0;for(const[n,a]of p.h)v+=a*Math.sin(2*Math.PI*p.f*n*t+n*.7);v/=sum;
+  if(p.am)v*=1-p.amd+p.amd*Math.sin(Math.PI*p.am*t)**2;f[i]=Math.tanh(v*p.drive*2)}
+ return wavOf(f)}
+const DRF=[
+ {nm:'キュッ（内蔵）',tones:[[1180,.5,7],[1530,.35,5],[2260,.2,11]],nz:{lo:1500,hi:5000,n:90,a:.25}},
+ {nm:'ザー（内蔵）',tones:[],nz:{lo:200,hi:6000,n:160,a:1}},
+ {nm:'高音スキール（内蔵）',tones:[[2100,.5,9],[2800,.4,6],[3500,.25,13]],nz:{lo:2000,hi:6000,n:60,a:.15}},
+ {nm:'低いうなり（内蔵）',tones:[[420,.6,4],[630,.4,3]],nz:{lo:300,hi:3000,n:100,a:.35}}];
+function drfWav(p){const L=SRT,f=new Float32Array(L),TP=Math.PI*2;
+ for(const[fr,a,am]of p.tones)for(let i=0;i<L;i++){const t=i/SRT;f[i]+=a*Math.sin(TP*fr*t)*(.6+.4*Math.sin(TP*am*t))}
+ for(let k=0;k<p.nz.n;k++){const fr=p.nz.lo+Math.floor(Math.random()*(p.nz.hi-p.nz.lo)),ph=Math.random()*TP,a=p.nz.a*.06;for(let i=0;i<L;i++)f[i]+=a*Math.sin(TP*fr*i/SRT+ph)}
+ return wavOf(f)}
+ENG.forEach((p,i)=>{$('ep'+i).onclick=async()=>{actx();await setSound('engine',engWav(p),p.nm,true)}});
+DRF.forEach((p,i)=>{$('dp'+i).onclick=async()=>{actx();await setSound('drift',drfWav(p),p.nm,true)}});
 const clrSnd=k=>()=>{snd[k]=null;sndSrc[k]=null;stopSnd(k);idbSet(k,null);if(room)room.emit('snd',{k,clear:true,buf:null}).catch(()=>{});$('s_'+k).textContent='（音なし）'};
 $('ce').onclick=clrSnd('engine');$('cd').onclick=clrSnd('drift');
 $('vol').value=Math.round(vol*100);
@@ -464,10 +545,10 @@ function audioFrame(){
 }
 
 /* ---- 描画 ---- */
-function drawCar(x,y,h,img,c,nm,self,brk){
+function drawCar(x,y,h,img,c,nm,self,brk,st){
  ctx.save();ctx.translate(x,y);
  ctx.save();ctx.rotate(h+Math.PI/2);ctx.translate(4,4);ctx.globalAlpha=.18;ctx.fillStyle='#000';rr(ctx,-17,-33,34,66,10);ctx.restore();
- ctx.save();ctx.rotate(h+Math.PI/2);carShape(ctx,img,c);ctx.restore();
+ ctx.save();ctx.rotate(h+Math.PI/2);carShape(ctx,img,c,st);ctx.restore();
  if(nm){ctx.rotate(-camRot);ctx.font='bold 17px sans-serif';ctx.textAlign='center';ctx.fillStyle=self?'#fff':'#ffe27a';ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=3;ctx.strokeText(nm,0,-48);ctx.fillText(nm,0,-48)}
  ctx.restore();
 }
@@ -494,7 +575,7 @@ function gate(i,chk){ctx.save();ctx.translate(T[i][0],T[i][1]);ctx.rotate(TH[i])
  ctx.restore()}
 let last=performance.now();
 function frame(now){
- const dt=Math.min(.05,(now-last)/1000);last=now;
+ const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(state==='count'){const rem=cdEnd-now;
   if(rem<=0){state='race';t0=now;goUntil=now+800;$('big').textContent='GO!'}else $('big').textContent=Math.ceil(rem/1000)}
  if(state==='race'||state==='done')step(dt,input());
@@ -553,11 +634,11 @@ function frame(now){
    const ddt=Math.max(dt,.001);r.vx=(r.vx||0)*.8+((r.x-(r.px??r.x))/ddt)*.2;r.vy=(r.vy||0)*.8+((r.y-(r.py??r.y))/ddt)*.2;r.px=r.x;r.py=r.y;
    rearFx(r.x,r.y,r.h,r.vx,r.vy,false);
    if(state==='count'||state==='race'||state==='done')remSnd(q.peer,r);
-   drawCar(r.x,r.y,r.h,skins.get(q.peer),validCol(s.col),String(s.name||'').slice(0,12),false,!!s.b);
+   drawCar(r.x,r.y,r.h,skins.get(q.peer),validCol(s.col),String(s.name||'').slice(0,12),false,!!s.b,Math.max(0,Math.min(5,s.cs|0)));
   }
   for(const k of rem.keys())if(!seen.has(k)){rem.delete(k);stopRem(k)}
  }
- if(state!=='menu')drawCar(me.x,me.y,me.h,meImg,col,'',true,me.brk);
+ if(state!=='menu')drawCar(me.x,me.y,me.h,meImg,col,'',true,me.brk,carStyle);
 const inR=state==='race'||state==='done'||state==='count';$('sp').style.display=inR?'block':'none';
  if(inR)drawGauge(Math.hypot(me.vx,me.vy),dt);
  /* HUD */
