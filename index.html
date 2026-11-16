@@ -71,6 +71,8 @@ button{font:inherit;cursor:pointer}
   <div class="row"><span style="width:76px;font-size:13px">音量</span><input type="range" id="vol" min="0" max="100" style="flex:1"></div>
   <label class="l">カメラの近さ（遊んでいる最中は ↑ ↓ キーでも調整）</label>
   <input type="range" id="cz" min="60" max="250" style="width:100%">
+  <label class="l">コースの雰囲気</label>
+  <div class="row"><button class="sc" id="sty0">🏁 ふつう</button><button class="sc" id="sty1">⛰️ 峠</button></div>
   <label class="l">カメラの追従（左：ゆるく遅れてついてくる ／ 右：ぴったり）</label>
   <input type="range" id="cf" min="0" max="100" style="width:100%">
   <label class="l">ルーム名（友だちと同じ文字を入れると同じレースに入れます）</label>
@@ -113,7 +115,8 @@ function resize(){DPR=Math.min(2,devicePixelRatio||1);W=cv.clientWidth;H=cv.clie
 addEventListener('resize',resize);resize();
 
 /* ---- コース ---- */
-const HW=78.2,LAPS=3;  /* 道の半分の太さ（最初の85の0.92倍） */
+let touge=LS('dr_touge')!=='0';
+let HW=touge?68:78.2;const LAPS=3;  /* 道の半分の太さ：峠は68 / ふつうは78.2 */
 /* 速度の設定：最高速度 / いちばん遅い速度 / 加速のはやさ / 減速のはやさ */
 /* 車のタイプごとの性能：K=メーターの最高km/h / 加速 / 曲がりやすさ / タイヤのグリップ */
 const CARS={
@@ -128,8 +131,10 @@ function applyCar(){const c=CARS[carType];MAXV=c.K/.3;ACC=c.ACC;TURN=c.TURN;GRIP
 applyCar();
 /* ダート（コース外）：この速度まで一気に落ちる / 落ちるはやさ */
 const DIRTV=100,DIRTDEC=650;
-const DEF=[800,1000,700,950,650,900,750,1000,680,880].map((r,i,A)=>{const a=i/A.length*Math.PI*2-Math.PI/2;r*=1.8;return[Math.round(Math.cos(a)*r),Math.round(Math.sin(a)*r)]});
-let T=[],TH=[],path=null,N=0,curPts=null,curLine=false,CLOSED=true,SI=0,GI=0,FINT=1;
+const DEF_T=[[49,-2115],[751,-1158],[1994,-1146],[2114,-86],[2059,1024],[556,1136],[162,2110],[-1286,1907],[-1727,1222],[-2109,-175],[-1047,-710],[-957,-2091]];
+const DEF_N=[800,1000,700,950,650,900,750,1000,680,880].map((r,i,A)=>{const a=i/A.length*Math.PI*2-Math.PI/2;r*=1.8;return[Math.round(Math.cos(a)*r),Math.round(Math.sin(a)*r)]});
+let DEF=touge?DEF_T:DEF_N;
+let TR=[],T=[],TH=[],path=null,N=0,curPts=null,curLine=false,CLOSED=true,SI=0,GI=0,FINT=1;
 const RUN=26;
 function sampleTrack(PT,line){
  const out=[],K=PT.length;
@@ -154,6 +159,11 @@ function setTrack(PT,line){
  TH=T.map((p,i)=>{const j=(!CLOSED&&i===N-1)?N-2:i,a=T[j],b=T[(j+1)%N];return Math.atan2(b[1]-a[1],b[0]-a[0])});
  FINT=CLOSED?LAPS*N:GI-SI;
  path=new Path2D();T.forEach((p,i)=>i?path.lineTo(p[0],p[1]):path.moveTo(p[0],p[1]));if(CLOSED)path.closePath();
+ TR=[];const lim2=(HW+64)*(HW+64);
+ if(touge)for(let i=0;i<N;i+=6){const th=TH[i];for(const sd of [-1,1])for(let k=0;k<1;k++){
+  const off=HW+75+Math.random()*300,x=T[i][0]-Math.sin(th)*sd*off+(Math.random()-.5)*40,y=T[i][1]+Math.cos(th)*sd*off+(Math.random()-.5)*40;
+  let ok=true;for(let j=0;j<N;j+=3){const dx=x-T[j][0],dy=y-T[j][1];if(dx*dx+dy*dy<lim2){ok=false;break}}
+  if(ok)TR.push([x,y,20+Math.random()*22,Math.random()<.35?1:0])}}
 }
 function near(x,y,from){let best=from,bd=1e18;for(let k=-12;k<=12;k++){let i=from+k;if(CLOSED)i=(i+N)%N;else if(i<0||i>=N)continue;const dx=x-T[i][0],dy=y-T[i][1],d=dx*dx+dy*dy;if(d<bd){bd=d;best=i}}return[best,Math.sqrt(bd)]}
 function validPts(p){return Array.isArray(p)&&p.length>=8&&p.length<=200&&p.every(q=>Array.isArray(q)&&q.length===2&&Number.isFinite(q[0])&&Number.isFinite(q[1])&&Math.abs(q[0])<40000&&Math.abs(q[1])<40000)}
@@ -505,10 +515,24 @@ function frame(now){
  if(camY<0)camY=H*.5;camY+=((state==='menu'?H*.5:Math.min(H*.9,H*.68+68*z))-camY)*(1-Math.exp(-8*dt));
  ctx.translate(W/2,camY);ctx.rotate(camRot);ctx.scale(z,z);ctx.translate(-cam.x,-cam.y);
  ctx.lineJoin='round';ctx.lineCap='butt';
+ if(touge){ctx.fillStyle='#2b5a37';ctx.fillRect(cam.x-3000,cam.y-3000,6000,6000);
+ const cr2=Math.pow(Math.hypot(W/2,H*.9)/z+40,2);
+ for(const t of TR){const dx=t[0]-cam.x,dy=t[1]-cam.y;if(dx*dx+dy*dy>cr2)continue;
+  ctx.fillStyle=t[3]?'#163a22':'#1d4a2a';ctx.beginPath();ctx.arc(t[0],t[1],t[2],0,7);ctx.fill();
+  ctx.fillStyle=t[3]?'#235232':'#2f6e3e';ctx.beginPath();ctx.arc(t[0]-t[2]*.18,t[1]-t[2]*.18,t[2]*.58,0,7);ctx.fill()}
+ ctx.lineWidth=HW*2+26;ctx.strokeStyle='#6c727c';ctx.stroke(path);
+ ctx.lineWidth=HW*2+16;ctx.strokeStyle='#c9cdd3';ctx.stroke(path);
+ ctx.lineWidth=HW*2+26;ctx.strokeStyle='#454a53';ctx.setLineDash([5,70]);ctx.stroke(path);ctx.setLineDash([]);
+ ctx.lineWidth=HW*2;ctx.strokeStyle='#3d424d';ctx.stroke(path);
+ ctx.lineWidth=HW*2-4;ctx.strokeStyle='rgba(255,255,255,.55)';ctx.stroke(path);
+ ctx.lineWidth=HW*2-10;ctx.strokeStyle='#3d424d';ctx.stroke(path);
+ ctx.lineWidth=4;ctx.strokeStyle='rgba(255,214,90,.75)';ctx.setLineDash([30,30]);ctx.stroke(path);ctx.setLineDash([]);
+ }else{
  ctx.lineWidth=HW*2+28;ctx.strokeStyle='#d94a3d';ctx.stroke(path);
  ctx.setLineDash([34,34]);ctx.strokeStyle='#fff';ctx.stroke(path);ctx.setLineDash([]);
  ctx.lineWidth=HW*2;ctx.strokeStyle='#4b5160';ctx.stroke(path);
  ctx.lineWidth=4;ctx.strokeStyle='rgba(255,255,255,.4)';ctx.setLineDash([26,34]);ctx.stroke(path);ctx.setLineDash([]);
+ }
  if(CLOSED)gate(0,true);else{gate(SI,false);gate(GI,true)}
  for(const t of trail){t[2]-=dt*.5}
  while(trail.length&&trail[0][2]<=0)trail.shift();
@@ -627,7 +651,7 @@ function previewCourse(){
  const cw=dc.clientWidth,ch=dc.clientHeight,k=Math.min(cw,ch)*.82/Math.max(x1-x0,y1-y0);
  dg.save();dg.translate(cw/2,ch/2);dg.scale(k,k);dg.translate(-(x0+x1)/2,-(y0+y1)/2);
  dg.lineJoin='round';dg.beginPath();TT.forEach((p,i)=>i?dg.lineTo(p[0],p[1]):dg.moveTo(p[0],p[1]));if(!line)dg.closePath();
- dg.lineWidth=HW*2+28;dg.strokeStyle='#d94a3d';dg.stroke();dg.lineWidth=HW*2;dg.strokeStyle='#4b5160';dg.stroke();
+ dg.lineWidth=HW*2+(touge?24:28);dg.strokeStyle=touge?'#9ba1ab':'#d94a3d';dg.stroke();dg.lineWidth=HW*2;dg.strokeStyle='#4b5160';dg.stroke();
  const mark=(i,j,c1,c2)=>{const p=TT[i],q=TT[j],an=Math.atan2(q[1]-p[1],q[0]-p[0]);dg.save();dg.translate(p[0],p[1]);dg.rotate(an);
   dg.fillStyle=c1;dg.fillRect(-9,-HW,18,HW);dg.fillStyle=c2;dg.fillRect(-9,0,18,HW);dg.restore()};
  mark(0,1,'#fff','#fff');if(line)mark(TT.length-1,TT.length-2,'#fff','#111');
@@ -645,12 +669,12 @@ function randomCourse(line){
  for(let tries=0;tries<6;tries++){
   const ctrl=[];
   if(!line){
-   const n=Math.floor(rnd(9,15)),sx=rnd(.8,1.25);let r=rnd(.6,1);
-   for(let i=0;i<n;i++){const a=(i+rnd(-.25,.25))/n*Math.PI*2;r=Math.max(.45,Math.min(1,r+rnd(-.4,.4)));ctrl.push([Math.cos(a)*r*1000*sx,Math.sin(a)*r*1000])}
+   const n=Math.floor(touge?rnd(12,18):rnd(9,15)),sx=rnd(.8,1.25);let r=rnd(.6,1);
+   for(let i=0;i<n;i++){const a=(i+rnd(touge?-.2:-.25,touge?.2:.25))/n*Math.PI*2;r=Math.max(touge?.4:.45,Math.min(1,r+rnd(touge?-.5:-.4,touge?.5:.4)));ctrl.push([Math.cos(a)*r*1000*sx,Math.sin(a)*r*1000])}
   }else{
-   const n=Math.floor(rnd(8,13));let x=0,y=0,h=rnd(0,Math.PI*2),sg=Math.random()<.5?1:-1,net=0;ctrl.push([0,0]);
-   for(let i=1;i<n;i++){const d=rnd(.3,.95);h+=sg*d;net+=sg*d;if(Math.random()<.4||Math.abs(net)>2.2)sg=net>0?-1:1;
-    const l=rnd(600,1000);x+=Math.cos(h)*l;y+=Math.sin(h)*l;ctrl.push([x,y])}
+   const n=Math.floor(touge?rnd(11,17):rnd(8,13));let x=0,y=0,h=rnd(0,Math.PI*2),sg=Math.random()<.5?1:-1,net=0;ctrl.push([0,0]);
+   for(let i=1;i<n;i++){const d=touge?(Math.random()<.2?rnd(1.5,2.1):rnd(.4,1.1)):rnd(.3,.95);h+=sg*d;net+=sg*d;if(Math.random()<(touge?.55:.4)||Math.abs(net)>(touge?2.6:2.2))sg=net>0?-1:1;
+    const l=touge?rnd(480,900):rnd(600,1000);x+=Math.cos(h)*l;y+=Math.sin(h)*l;ctrl.push([x,y])}
   }
   const pts=courseFrom(sampleTrack(ctrl,line),line,dFac);
   if(pts&&validPts(pts)){setCourse(pts,true,line);msg('ランダムなコースを作りました（気に入らなければもう一度おしてください）',3500);return}
@@ -666,6 +690,11 @@ function setCourse(pts,save,line){
  curPts=pts;curLine=!!(pts&&line);setTrack(pts||DEF,curLine);if(save)LS('dr_course',pts?JSON.stringify({p:pts,l:curLine}):'');
  if(state==='lobby'||state==='menu')placeMe(0);courseLabel();
 }
+function styleUI(){$('sty0').classList.toggle('on2',!touge);$('sty1').classList.toggle('on2',touge)}
+function setStyle(v){if(touge===v)return;touge=v;LS('dr_touge',v?'1':'0');HW=v?68:78.2;DEF=v?DEF_T:DEF_N;
+ if(!curPts)LS('dr_best','');
+ setTrack(curPts||DEF,curLine);if(state==='lobby'||state==='menu')placeMe(0);courseLabel();styleUI()}
+$('sty0').onclick=()=>setStyle(false);$('sty1').onclick=()=>setStyle(true);styleUI();
 $('dw1').onclick=()=>openDraw('menu');$('dw2').onclick=()=>openDraw('lobby');
 $('df1').onclick=$('df2').onclick=()=>setCourse(null,true);
 courseLabel();
