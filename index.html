@@ -662,6 +662,7 @@ $('dsz').value=Math.round(dFac*100);$('dsz').oninput=e=>{dFac=e.target.value/100
 modeUI();
 function courseLabel(){const t=curPts?(curLine?'オリジナルコース（スタート→ゴール）':'オリジナルコース（周回）'):'標準コース';$('cs').textContent='いまのコース：'+t;$('cs2').textContent='コース：'+t+'（開始した人のコースでレースします）'}
 function setCourse(pts,save,line){
+ if(JSON.stringify([pts||null,!!(pts&&line)])!==JSON.stringify([curPts||null,curLine]))LS('dr_best','');
  curPts=pts;curLine=!!(pts&&line);setTrack(pts||DEF,curLine);if(save)LS('dr_course',pts?JSON.stringify({p:pts,l:curLine}):'');
  if(state==='lobby'||state==='menu')placeMe(0);courseLabel();
 }
