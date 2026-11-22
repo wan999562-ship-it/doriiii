@@ -381,7 +381,7 @@ function begin(k,sel,sup){sup=sup||[];if(S.tr&&!confirm('育成中のデータ�
 if(sel.length&&!confirm('選んだ個体を消費します（元に戻せません）。よろしいですか？'))return;
 const[c,r]=k.split('_'),lb=lbOf(S.owned[k]),m=RAR[r].m*(1+.05*lb),bn=bonus(sel),sb=supBonus(sup),fcap=sel.reduce((a,u)=>a+(avg(S.inds.find(x=>x.uid==u).st)>=800?50:0),0),sk=[];
 sk.push('@'+c);
-sel.forEach(u=>{const x=S.inds.find(y=>y.uid==u),pl=x.sk.filter(q=>q[0]!='@');if(pl.length&&Math.random()<.6){const n=P(pl);if(!sk.includes(n)&&sk.filter(q=>q[0]!='@').length<MAXSK)sk.push(n)}});
+sel.forEach(u=>{const x=S.inds.find(y=>y.uid==u),pl=x.sk.filter(q=>q[0]!='@');if(pl.length&&Math.random()<.6){const n=P(pl);if(!sk.includes(n)&&sk.filter(q=>q[0]!='@').length<MAXSK)sk.push(n)}if(Math.random()<.3&&!sk.includes('@'+x.cid))sk.push('@'+x.cid)});
 S.inds=S.inds.filter(x=>!sel.includes(x.uid));
 S.tr={cid:+c,r,lb,t:1,en:100,st:CH[c].b.map((v,i)=>Math.min(1200,Math.round(v*m)+bn[i]+sb.st[i])),sk,msg:'育成スタート！'+(sel.length?'\n🧬因子継承：'+bn.map((v,i)=>ST[i]+'+'+v).join(' ')+(sk.length?'／所持スキル：'+sk.map(sn).join('、'):''):'')+(sup.length?'\n🃏サポート：'+supSum(sup):''),pend:null,k,money:1000+sb.mo,cap:1200+sb.cp+fcap,buff:0,v2:1,slv:{},sup:sup.map(kk=>{const[id,r2]=kk.split('_');return{id:+id,r:r2,lb:Math.min(4,S.sup[kk]-1)}})};save();go('train')}
 const phase=t=>t<=5?'新人時代':t<=10?'仕事が増える':t<=15?'専門分野の選択':t<=20?'人気上昇':t<=25?'大きな仕事':t<30?'最終調整':'最終オーディション';
@@ -598,7 +598,7 @@ return`<h1>🧬 育成準備</h1><div class="card"><div class="row">${av(+c,r,50
 <h2>🃏 サポートカード（最大3枚）</h2><div class="card mut">装備すると初期ステータスと該当トレーニングの効果が上がります。<button class="btn g" style="margin-top:6px;padding:8px" onclick="supAuto()">おまかせ編成</button></div>
 <div class="scl">${ks.map(kk=>{const[id,rr]=kk.split('_'),lb=Math.min(4,S.sup[kk]-1),v=supVal(+id,rr,lb);return`<label class="card row"><input type="checkbox" ${sup.includes(kk)?'checked':''} onchange="togS('${kk}')"><div class="av" style="--h:${SUP[id].h};width:44px;height:44px;font-size:24px;border-color:${RC[rr]}">${SUP[id].e}</div><span style="flex:1"><b>${SUP[id].n}</b> ${tag(rr)} <span class="mut">${lb}凸</span><div class="mut">${SUP[id].d}の初期値+${v.init}／該当トレ効果+${Math.round(v.tb*100)}%${v.mo?'／初期資金+¥'+v.mo:''}${v.cp?'／🌟上限+'+v.cp:''}</div><div class="mut">✨${spText(+id,rr,lb)}</div><div class="mut">🃏専用スキル「${SUPSK[+id]}」（装備すると、スキル選択に出ることがあります）</div></span></label>`}).join('')}</div>
 <div class="card"><b>サポート効果</b>（${sup.length}/3）<br>${supSum(sup)}</div>
-<h2>🧬 因子継承（最大2体）</h2><div class="card mut">過去に育成した個体を消費すると、各ステータスが消費個体の12%ぶん上がった状態でスタートし、スキルを引き継ぐこともあります(各60%)。平均800以上の個体を消費すると、上限+50。消費した個体は失われます。</div>
+<h2>🧬 因子継承（最大2体）</h2><div class="card mut">過去に育成した個体を消費すると、各ステータスが消費個体の12%ぶん上がった状態でスタートし、スキルを引き継ぐこともあります(各60%)。さらに、その個体の<b>固有スキル</b>も30%の確率で引き継げます（固有スキルは別枠で、手札を圧迫しません）。平均800以上の個体を消費すると、上限+50。消費した個体は失われます。</div>
 <div class="scl">${S.inds.map(i=>`<label class="card row"><input type="checkbox" ${sel.includes(i.uid)?'checked':''} onchange="tog(${i.uid})">${av(i.cid,i.r,40)}<span style="flex:1">${CH[i.cid].n} ${tag(i.r)}<div class="mut">${i.sk.map(sn).join('、')||'スキルなし'}</div></span>${badge(i.st)}</label>`).join('')||'<div class="card mut">育成済みの個体はまだいません。</div>'}</div>
 <div class="card"><b>因子の初期ステータス上昇</b><br>${bn.map((v,i)=>ST[i]+'+'+v).join(' ／ ')}</div>
 <div class="stick"><button class="btn" onclick="begin('${k}',cx.sel,cx.sup)">▶ 育成開始（サポート${sup.length}/3・因子${sel.length}/2）</button></div>${back('owned')}`};
